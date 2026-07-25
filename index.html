@@ -123,49 +123,49 @@
 <script>
     let deferredPrompt = null;
 
-    // Captura o evento de instalação do PWA
+    // Captura o evento (Só vai disparar no Android/Chromium)
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-
-        console.log('PWA pronto para instalar');
+        console.log('PWA pronto para instalar no Android/Desktop');
     });
 
-    // Função para instalar
+    // Função para identificar se o dispositivo é iOS (iPhone/iPad)
+    function isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+
     async function instalarApp() {
-
-        // Se o navegador suportar instalação direta
+        // Se suportar instalação direta (Android / Chrome Desktop)
         if (deferredPrompt) {
-
             deferredPrompt.prompt();
-
             const { outcome } = await deferredPrompt.userChoice;
-
             if (outcome === 'accepted') {
                 console.log('Usuário instalou o app');
             }
-
             deferredPrompt = null;
-
-        } else {
-
-            // fallback caso não suporte
-            window.location.href = 'https://app.cartaoamarelinho.com.br';
-
+        } 
+        // Fallback específico para iPhone
+        else if (isIOS()) {
+            // AQUI: Ative um modal, banner ou alert customizado na sua tela
+            alert("No iPhone, a instalação direta por botão não é permitida pela Apple.\n\nPara baixar:\n1. Toque no botão 'Compartilhar' (ícone de quadrado com seta para cima abaixo)\n2. Role para baixo e selecione 'Adicionar à Tela de Início'.");
+        } 
+        // Outros casos que não suportam (PCs antigos, navegadores sem suporte)
+        else {
+            window.location.href = 'https://cartaoamarelinho.com.br';
         }
     }
 
-    // BOTÕES
+    // Vinculação dos BOTÕES
     document.querySelectorAll(
         '#btnBaixarHero, #consumerGooglePlay, #consumerAppStore, #finalConsumerBtn, #btnMockGooglePlay, #btnMockAppStore'
     ).forEach(btn => {
-
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             instalarApp();
         });
-
     });
+
 </script>
 </body>
 </html>
